@@ -92,40 +92,42 @@ ggplot(
 
 The ridge chart groups `bound_avg` by `cat_final`, the ordered Low, Mid, and High categories created from `mfn_avg` in Test 3. The Low group is concentrated mainly around 5–15, the Mid group covers a wider range, and the High group shifts farther to the right. Missing values and bound-tariff observations above 75 are excluded so the central differences remain readable.
 
-```{r ridge, fig.cap="Bound tariff distributions across Low, Mid, and High MFN tariff groups", fig.width=8, fig.height=5}
-ggplot(
-  df |>
-    filter(
-      !is.na(bound_avg),
-      !is.na(cat_final),
-      bound_avg <= 75
-    ),
+```{r ridge, fig.cap="Bound average tariff by MFN tariff group"}
+df_ridge <- df |>
+  mutate(
+    cat_final_clean = factor(
+      unclass(cat_final),
+      levels = c(1, 2, 3),
+      labels = c("Low", "Mid", "High"),
+      ordered = TRUE
+    )
+  ) |>
+  filter(
+    !is.na(bound_avg),
+    !is.na(cat_final_clean),
+    bound_avg <= 75
+  )
+
+ridge2 <- ggplot(
+  df_ridge,
   aes(
     x    = bound_avg,
-    y    = cat_final,
-    fill = cat_final
+    y    = cat_final_clean,
+    fill = cat_final_clean
   )
 ) +
-  geom_density_ridges(
-    alpha = 0.6
-  ) +
+  geom_density_ridges(alpha = 0.6) +
   labs(
     title = NULL,
     x     = NULL,
     y     = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal() +
   theme(
-    legend.position    = "none",
-    panel.grid.minor   = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.grid.major.x = element_line(
-      colour = "#eeeeee"
-    ),
-    axis.text = element_text(
-      colour = "#555"
-    )
+    legend.position = "none"
   )
+
+ridge2
 ```
 
 </section>
@@ -136,10 +138,10 @@ ggplot(
 
 The typical country-product group has meaningful room between its applied MFN tariff and its WTO bound ceiling. The 18.3 percentage-point median duty gap shows that current rates often sit well below the maximum commitments recorded in the data.
 
-The charts also show why a single average is not enough. Higher MFN tariff groups tend to have wider and more right-shifted bound-tariff distributions. A decision-maker comparing sectors or negotiating priorities should look beyond the overall median and identify the product groups where both applied rates and tariff ceilings remain high.
+The charts also show why a single average is not enough. Higher MFN tariff groups tend to have wider and more right-shifted bound-tariff distributions. A decision-maker comparing product groups or negotiating priorities should look beyond the overall median and identify the product groups where both applied rates and tariff ceilings remain high.
 
 </section>
 
 <footer class="report-footer fade-in">
-  <p>Repository: <a href="https://github.com/YOUR_GITHUB_USERNAME/mbaa531-report">https://github.com/YOUR_GITHUB_USERNAME/mbaa531-report</a></p>
+  <p>Repository: <a href="https://github.com/Mozhgan194/mbaa531-report">https://github.com/Mozhgan194/mbaa531-report</a></p>
 </footer>
