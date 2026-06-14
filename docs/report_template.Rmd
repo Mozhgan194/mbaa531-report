@@ -1,0 +1,145 @@
+---
+pagetitle: "Tariff Ceilings Leave Wide Room Above Applied Rates"
+output:
+  html_document:
+    theme: null
+    highlight: null
+    mathjax: null
+    css: report.css
+    includes:
+      after_body: report_scroll.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo    = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+
+library(dplyr)
+library(ggplot2)
+library(ggridges)
+
+df <- readRDS("../data/test4_dataset.rds")
+```
+
+<div class="report-header fade-in">
+  <p class="kicker">WTO tariff data</p>
+  <h1>Tariff Ceilings Leave Wide Room Above Applied Rates</h1>
+  <p class="deck">Across country-product groups, WTO tariff ceilings typically sit above applied MFN rates, while higher-rate groups also show wider bound-tariff distributions.</p>
+  <p class="byline">By Mozhgan G.</p>
+</div>
+
+<section class="report-section fade-in">
+
+## The Data
+
+This report examines 3,366 country-product group observations from a tariff dataset. Each row represents one country and one WTO product group. The key measures are `mfn_avg`, the average applied most-favoured-nation tariff, and `bound_avg`, the average WTO bound tariff ceiling. Applied rates show the duties currently used, while bound rates show the maximum commitments recorded in the dataset. Missing values are removed only when a chart requires them. For the ridge chart, values above 75 are excluded so the comparison focuses on the main body of the distributions.
+
+</section>
+
+<div class="pull-stat fade-in">
+  <span class="stat-number">18.3</span>
+  <span class="stat-label">percentage points: the median gap between the WTO bound tariff ceiling and the applied MFN tariff rate.</span>
+</div>
+
+<section class="report-section fade-in">
+
+## A Closer Look
+
+The scatter plot compares applied MFN average tariffs with bound average tariffs. Most observations cluster at low applied rates, especially below about 20, while bound rates vary much more widely. The upward pattern suggests that country-product groups with higher applied tariffs often also have higher tariff ceilings, although the spread is broad and several observations stand out as outliers.
+
+```{r scatter, fig.cap="Applied MFN tariffs and bound tariff ceilings", fig.width=8, fig.height=5}
+ggplot(
+  df |>
+    filter(
+      !is.na(mfn_avg),
+      !is.na(bound_avg)
+    ),
+  aes(
+    x = mfn_avg,
+    y = bound_avg
+  )
+) +
+  geom_point(
+    alpha  = 0.35,
+    size   = 1.4,
+    colour = "#c0392b"
+  ) +
+  labs(
+    title = NULL,
+    x     = NULL,
+    y     = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(
+      colour = "#eeeeee"
+    ),
+    axis.text = element_text(
+      colour = "#555"
+    )
+  )
+```
+
+</section>
+
+<section class="report-section fade-in">
+
+## Across Tariff Groups
+
+The ridge chart groups `bound_avg` by `cat_final`, the ordered Low, Mid, and High categories created from `mfn_avg` in Test 3. The Low group is concentrated mainly around 5–15, the Mid group covers a wider range, and the High group shifts farther to the right. Missing values and bound-tariff observations above 75 are excluded so the central differences remain readable.
+
+```{r ridge, fig.cap="Bound tariff distributions across Low, Mid, and High MFN tariff groups", fig.width=8, fig.height=5}
+ggplot(
+  df |>
+    filter(
+      !is.na(bound_avg),
+      !is.na(cat_final),
+      bound_avg <= 75
+    ),
+  aes(
+    x    = bound_avg,
+    y    = cat_final,
+    fill = cat_final
+  )
+) +
+  geom_density_ridges(
+    alpha = 0.6
+  ) +
+  labs(
+    title = NULL,
+    x     = NULL,
+    y     = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position    = "none",
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.major.x = element_line(
+      colour = "#eeeeee"
+    ),
+    axis.text = element_text(
+      colour = "#555"
+    )
+  )
+```
+
+</section>
+
+<section class="report-section fade-in">
+
+## What This Means
+
+The typical country-product group has meaningful room between its applied MFN tariff and its WTO bound ceiling. The 18.3 percentage-point median duty gap shows that current rates often sit well below the maximum commitments recorded in the data.
+
+The charts also show why a single average is not enough. Higher MFN tariff groups tend to have wider and more right-shifted bound-tariff distributions. A decision-maker comparing sectors or negotiating priorities should look beyond the overall median and identify the product groups where both applied rates and tariff ceilings remain high.
+
+</section>
+
+<footer class="report-footer fade-in">
+  <p>Repository: <a href="https://github.com/YOUR_GITHUB_USERNAME/mbaa531-report">https://github.com/YOUR_GITHUB_USERNAME/mbaa531-report</a></p>
+</footer>
